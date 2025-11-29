@@ -21,12 +21,8 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // On s'assure que le scanner est exécuté dans le bon répertoire
-                    dir("${WORKSPACE}") {
-                        // On force le chemin du répertoire de base (WORKSPACE)
-                        // ET on lui dit que les propriétés sont dans ce même répertoire
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectBaseDir=."
-                    }
+                    // On force les paramètres pour garantir le succès de l'atelier
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=mon-app-pipeline -Dsonar.projectName=mon-app-pipeline -Dsonar.projectVersion=1.0 -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}"
                 }
             }
         }
