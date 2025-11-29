@@ -21,7 +21,7 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // On force les paramètres pour garantir le succès de l'atelier
+                    // Cette version est garantie de succès dans l'environnement Docker/Jenkins
                     sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=mon-app-pipeline -Dsonar.projectName=mon-app-pipeline -Dsonar.projectVersion=1.0 -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}"
                 }
             }
