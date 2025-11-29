@@ -21,8 +21,9 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // Version propre et stable (sans le flag de debug -X)
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=mon-app-pipeline -Dsonar.projectName=mon-app-pipeline -Dsonar.projectVersion=1.0 -Dsonar.sources=. -Dsonar.projectBaseDir=${WORKSPACE}"
+                    // On indique seulement le dossier de travail.
+                    // Tout le reste (Clé, Nom, Sources) sera lu dans sonar-project.properties
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectBaseDir=${WORKSPACE}"
                 }
             }
         }
