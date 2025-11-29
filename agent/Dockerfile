@@ -1,8 +1,9 @@
 FROM node:18-bullseye
 USER root
-# Installation du client Docker pour lancer Trivy
+
+# Installation du client Docker ET de Java (pour SonarScanner)
 RUN apt-get update && \
-    apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release && \
+    apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release openjdk-11-jre && \
     mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg && \
     echo \
@@ -11,3 +12,4 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install -y docker-ce-cli
 USER node
+
