@@ -21,8 +21,12 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // On passe les paramètres clés directement pour garantir le succès
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=mon-app-pipeline -Dsonar.projectName=mon-app-pipeline -Dsonar.sources=."
+                    // DEBUG : On vérifie où on est et si le fichier est là
+                    sh 'pwd'
+                    sh 'ls -la'
+                    
+                    // On remet la commande standard qui utilise le fichier de propriétés
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
