@@ -2,8 +2,8 @@ pipeline {
     agent {
         dockerfile {
             dir 'agent'
-            // Le mapping du socket fonctionne sur Windows et Mac
-            args '-u root -v /var/run/docker.sock:/var/run/docker.sock --network mon-app-pipeline2_devsecops-net'
+            // Forcer l'exécution de l'agent en tant que root (UID 0) pour résoudre les problèmes de permission
+            args '-u 0 -v /var/run/docker.sock:/var/run/docker.sock --network mon-app-pipeline2_devsecops-net'
         }
     }
     stages {
