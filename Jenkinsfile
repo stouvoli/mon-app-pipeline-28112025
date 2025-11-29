@@ -21,11 +21,11 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // DEBUG : On vérifie où on est et si le fichier est là
-                    sh 'pwd'
+                    // DEBUG : On vérifie le dossier courant et la présence du fichier
+                    sh 'echo "Dossier courant : $(pwd)"'
                     sh 'ls -la'
                     
-                    // On remet la commande standard qui utilise le fichier de propriétés
+                    // Commande standard (elle doit trouver sonar-project.properties toute seule)
                     sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
