@@ -1,29 +1,46 @@
 pipeline {
     agent {
-        docker { 
-            image 'python:3.9-slim' 
-            args '-u root' 
+        dockerfile {
+            dir 'agent'
+            // Le mapping du socket fonctionne sur Windows et Mac
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
     stages {
-        stage('Setup') {
+        stage('Checkout') { steps { checkout scm } }
+        
+        stage('Analyse SCA (Dépendances)') {
             steps {
-                sh 'apt-get update && apt-get install -y wget curl git'
+                sh 'npm install'
+                // Bloquant si failles High trouvées
+                sh 'npm audit --audit-level=high' 
             }
         }
-        stage('SAST - Semgrep') {
+        
+        stage('Analyse SAST (SonarQube)') {
+            environment { scannerHome = tool 'SonarScanner' }
             steps {
-                sh 'pip install semgrep'
-                // On scanne et on bloque si erreur
-                sh 'semgrep scan --config=auto --error' 
+                withSonarQubeEnv('SonarQube') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
             }
         }
-        stage('SCA - Trivy') {
+        
+        stage('Quality Gate') {
             steps {
-                // Installation de Trivy
-                sh 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin'
-                // Scan des dépendances (bloquant sur HIGH/CRITICAL)
-                sh 'trivy fs . --exit-code 1 --severity HIGH,CRITICAL'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+        
+        stage('Build & Scan Image Docker') {
+            steps {
+                script {
+                    def dockerImage = docker.build("mon-app-pipeline:${env.BUILD_ID}")
+                    sh 'curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin'
+                    sh "trivy image --exit-code 1 --severity CRITICAL mon-app-pipeline:${env.BUILD_ID}"
+                }
             }
         }
     }
