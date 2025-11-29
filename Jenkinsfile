@@ -21,12 +21,8 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // DEBUG : On vérifie le dossier courant et la présence du fichier
-                    sh 'echo "Dossier courant : $(pwd)"'
-                    sh 'ls -la'
-                    
-                    // Commande standard (elle doit trouver sonar-project.properties toute seule)
-                    sh "${scannerHome}/bin/sonar-scanner"
+                    // On ajoute l'option -Dsonar.projectBaseDir=. pour forcer la lecture du fichier
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectBaseDir=."
                 }
             }
         }
