@@ -21,9 +21,7 @@ pipeline {
             environment { scannerHome = tool 'SonarScanner' }
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // On indique seulement le dossier de travail.
-                    // Tout le reste (Clé, Nom, Sources) sera lu dans sonar-project.properties
-                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectBaseDir=${WORKSPACE}"
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
